@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:terrapeer_mobile/app.dart';
 import 'package:terrapeer_mobile/core/router/app_destinations.dart';
 
-void main() {
-  void setScreen(WidgetTester tester, Size size) {
-    tester.view.physicalSize = size;
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-  }
+import 'helpers/test_app.dart';
 
+void main() {
   testWidgets('home lists every module', (tester) async {
-    setScreen(tester, const Size(400, 900));
-    await tester.pumpWidget(const TerraPeerApp(useGoogleFonts: false));
-    await tester.pumpAndSettle();
+    await pumpTerraPeer(tester);
 
     expect(find.text('Selamat datang di TerraPeer'), findsOneWidget);
     for (final d in moduleDestinations) {
@@ -22,9 +15,7 @@ void main() {
   });
 
   testWidgets('phone: drawer navigates to every module page', (tester) async {
-    setScreen(tester, const Size(400, 900));
-    await tester.pumpWidget(const TerraPeerApp(useGoogleFonts: false));
-    await tester.pumpAndSettle();
+    await pumpTerraPeer(tester);
 
     for (final d in moduleDestinations) {
       await tester.tap(find.byTooltip('Open navigation menu'));
@@ -41,9 +32,7 @@ void main() {
   });
 
   testWidgets('home card opens its module', (tester) async {
-    setScreen(tester, const Size(400, 900));
-    await tester.pumpWidget(const TerraPeerApp(useGoogleFonts: false));
-    await tester.pumpAndSettle();
+    await pumpTerraPeer(tester);
 
     await tester.tap(find.text('My Plants'));
     await tester.pumpAndSettle();
@@ -52,9 +41,7 @@ void main() {
   });
 
   testWidgets('tablet: navigation rail replaces the drawer', (tester) async {
-    setScreen(tester, const Size(1200, 900));
-    await tester.pumpWidget(const TerraPeerApp(useGoogleFonts: false));
-    await tester.pumpAndSettle();
+    await pumpTerraPeer(tester, size: tabletSize);
 
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byTooltip('Open navigation menu'), findsNothing);

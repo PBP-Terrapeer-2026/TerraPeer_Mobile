@@ -4,10 +4,14 @@ import '../../../../core/widgets/module_placeholder.dart';
 
 /// Entry page of the Garden Setup module.
 ///
-/// Module structure:
-///   data/models/     JSON models for this module's DRF endpoint
-///   data/services/   API calls for this module
-///   presentation/    pages and widgets
+/// Clean Architecture layers (see lib/features/auth for a complete example):
+///   domain/entities/       plain Dart classes (no Flutter, no JSON)
+///   domain/repositories/   abstract repository the UI depends on
+///   data/models/           JSON <-> entity conversion
+///   data/datasources/      calls to this module's DRF endpoint via ApiClient
+///   data/repositories/     implementation of the domain repository
+///   presentation/providers ChangeNotifier holding loading / data / error state
+///   presentation/pages     pages, presentation/widgets  reusable widgets
 class GardenSetupPage extends StatelessWidget {
   const GardenSetupPage({super.key});
 

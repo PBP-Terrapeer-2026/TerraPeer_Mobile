@@ -9,4 +9,9 @@ class AppRoutes {
   static const myPlants = '/my-plants';
   static const plantCare = '/plant-care';
   static const gardenJournal = '/garden-journal';
+  static const login = '/login';
+
+  /// Pages a guest (not logged in) may open. Everything else redirects
+  /// to [login] and comes back after a successful login.
+  static const publicRoutes = {home, login};
 }

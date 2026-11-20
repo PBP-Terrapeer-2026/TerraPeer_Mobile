@@ -1,16 +1,21 @@
 # TerraPeer Mobile
 
-Aplikasi mobile **TerraPeer** berbasis Flutter, dibuat untuk Proyek Akhir Semester mata kuliah Pemrograman Berbasis Platform (PBP) Fasilkom UI, Gasal 2026/2027.
+Aplikasi mobile **TerraPeer** berbasis Flutter, dibuat untuk Proyek Akhir Semester mata kuliah Pemrograman Berbasis Platform (PBP) Fasilkom UI, Gasal 2026/2027 — **Kelompok 5F**.
+
+· **Situs web (PWS):** <https://muhammad-farel52-terrapeer.pws.cs.ui.ac.id/>
+· **Repositori situs web:** [PBP-Terrapeer-2026/TerraPeer](https://github.com/PBP-Terrapeer-2026/TerraPeer)
+· **Desain:** [Figma TerraPeer](https://www.figma.com/design/fZa8nxPXXGqgu0ytl6WFhY/Terrapeer)
+· **APK:** _menyusul_
 
 ## Anggota Kelompok
 
-| Nama | NPM |
-| --- | --- |
-| Jotham Seanvedi Takin Allo | TODO |
-| Ayyasi | TODO |
-| Muhammad Farel Ammar | TODO |
-| Nashri Khalid | TODO |
-| Adinda Pika Fauziah | TODO |
+| Nama | NPM | GitHub |
+| --- | --- | --- |
+| Jotham Seanvedi Takin Allo | 2506584161 | [`seanve1`](https://github.com/seanve1) |
+| Ayyasi | 2506550482 | [`Asepgunawan112`](https://github.com/Asepgunawan112) |
+| Muhammad Farel Ammar | 2506585731 | [`marlioboro`](https://github.com/marlioboro) |
+| Nashri Khalid | 2506657131 | [`nashrikhalid`](https://github.com/nashrikhalid) |
+| Adinda Pika Fauziah | 2506533646 | [`pikadinda`](https://github.com/pikadinda) |
 
 ## Deskripsi Aplikasi
 
@@ -56,9 +61,19 @@ Flutter (widget) ──HTTP + token──▶ Django REST Framework (/api/v1/...)
 4. Aplikasi memanggil endpoint secara asinkron (`GET`/`POST`/`PUT`/`PATCH`/`DELETE`). Base URL diatur di `lib/core/config/env.dart`.
 5. Respons JSON diubah menjadi model Dart, lalu ditampilkan oleh widget. Data yang diubah dari aplikasi langsung terlihat di situs web, dan sebaliknya.
 
+## Sumber Data dan API Publik
+
+Data utama berasal dari database situs web TerraPeer (diakses lewat endpoint DRF di atas). Situs web memakai API publik berikut di sisi server, sehingga hasilnya ikut tersedia untuk aplikasi mobile:
+
+| API | Dipakai oleh |
+| --- | --- |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | Garden Setup, Garden Planning |
+| [Open-Meteo Forecast](https://open-meteo.com/en/docs) | Garden Planning, Plant Care |
+| [Perenual](https://www.perenual.com/docs/api) | My Plants, Garden Planning |
+
 ## Desain
 
-Figma: [TerraPeer](https://www.figma.com/design/fZa8nxPXXGqgu0ytl6WFhY/Terrapeer?)
+Figma: [TerraPeer](https://www.figma.com/design/fZa8nxPXXGqgu0ytl6WFhY/Terrapeer) (password akses: `TerrapeerPBP5F`). Warna dan tipografi aplikasi mengikuti design system yang sama dengan situs web.
 
 ## Unduh Aplikasi
 
@@ -78,30 +93,66 @@ Untuk memakai server Django lokal dari emulator Android:
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
-## Struktur Kode
+## Arsitektur
+
+Aplikasi memakai **Clean Architecture** per fitur. Setiap modul punya tiga lapisan, dan dependensi hanya mengarah ke dalam (`presentation` → `domain` ← `data`):
+
+| Lapisan | Isi | Boleh import |
+| --- | --- | --- |
+| `domain/` | Entity (kelas Dart murni) dan repository abstrak | Tidak ada (tanpa Flutter, tanpa HTTP) |
+| `data/` | Model JSON, data source (panggilan API lewat `ApiClient`), implementasi repository | `domain/`, `core/` |
+| `presentation/` | Provider (`ChangeNotifier`: state loading / data / error), pages, widgets | `domain/`, `core/` |
+
+Layanan bersama dibuat sekali di `main.dart` (composition root) lalu dibagikan dengan **Provider**. Modul `auth` adalah contoh lengkap ketiga lapisan.
 
 ```
 lib/
-├── main.dart
-├── app.dart                    # MaterialApp + router + tema
+├── main.dart                   # composition root: membuat ApiClient, AuthProvider
+├── app.dart                    # MultiProvider + MaterialApp.router + tema
 ├── core/                       # dipakai bersama oleh semua modul
-│   ├── config/env.dart         # base URL API
-│   ├── router/                 # go_router, daftar route & destinasi navigasi
+│   ├── config/env.dart         # base URL API (bisa diganti dengan --dart-define)
+│   ├── network/                # ApiClient (token, JSON, timeout) + ApiException (parser error DRF)
+│   ├── storage/                # penyimpanan token login
+│   ├── router/                 # go_router: route, guard login, transisi halaman
 │   ├── theme/                  # warna & tipografi (sama dengan situs web)
-│   └── widgets/                # app shell (drawer/rail), loading/error/empty view
+│   └── widgets/                # app shell (drawer / navigation rail), loading / error / empty view
 └── features/
+    ├── auth/                   # login, logout, sesi (contoh referensi)
     ├── home/
     ├── garden_setup/           # Jotham
     ├── garden_planning/        # Ayyasi
     ├── my_plants/              # Farel
     ├── plant_care/             # Nashri
     └── garden_journal/         # Adinda
-        ├── data/models/        # model JSON
-        ├── data/services/      # pemanggilan API
-        └── presentation/       # pages & widgets
+        ├── domain/{entities, repositories}/
+        ├── data/{models, datasources, repositories}/
+        └── presentation/{providers, pages, widgets}/
 ```
 
-Navigasi responsif: drawer di ponsel, navigation rail di tablet/layar lebar.
+### Navigasi dan autentikasi
+
+- **Responsif:** drawer di ponsel, navigation rail di tablet/layar lebar (≥ 840 px), dengan transisi fade antarhalaman.
+- **Guest** hanya bisa membuka Home dan Login. Membuka modul lain akan diarahkan ke Login, lalu otomatis kembali ke modul tersebut setelah berhasil masuk.
+- **Token** disimpan di perangkat sehingga pengguna tetap login setelah aplikasi ditutup. Jika server membalas `401` (token kedaluwarsa), pengguna otomatis keluar.
+
+### Memanggil API dari modul
+
+```dart
+// data/datasources/my_plants_remote_data_source.dart
+final json = await apiClient.get('/my-plants/');          // GET list
+await apiClient.post('/my-plants/', body: plant.toJson()); // POST create
+```
+
+Setiap kegagalan dilempar sebagai `ApiException` (berisi `message`, `statusCode`, dan `fieldErrors` per field dari serializer DRF), sehingga semua modul menampilkan error dengan cara yang sama.
+
+## Pengujian
+
+```bash
+flutter analyze
+flutter test
+```
+
+Test mencakup navigasi (drawer, navigation rail, kartu Home), alur login (validasi form, kredensial salah, redirect kembali ke modul, logout, token kedaluwarsa), aturan redirect, dan parser error DRF.
 
 ## Aturan Kolaborasi
 
@@ -114,6 +165,33 @@ Navigasi responsif: drawer di ponsel, navigation rail di tablet/layar lebar.
 - Navigasi selalu memakai konstanta `AppRoutes`, misalnya `context.go(AppRoutes.myPlants)`.
 - Jalankan `flutter analyze` dan `flutter test` sebelum membuka PR.
 
-## Penggunaan AI
+## AI Usage Disclosure
 
-TODO: tools AI yang digunakan, untuk apa, prompt/strategi, keterbatasan yang ditemukan, dan perbaikan manual yang dilakukan.
+Tim memakai alat AI sebagai asisten, bukan pengganti pemahaman. Semua perubahan masuk lewat pull request, di-review anggota lain, dan diuji (`flutter analyze`, `flutter test`).
+
+### Base template, My Plants — Muhammad Farel Ammar
+
+- **Alat:** Claude (Anthropic).
+- **Penggunaan:** membantu menyusun base template aplikasi (struktur folder per modul, tema dari design token situs web, routing `go_router` dengan drawer/navigation rail responsif, widget state bersama, widget test) dan README.
+- **Strategi prompt:** memberikan ketentuan tugas dan rubrik secara lengkap, meminta perubahan kecil yang di-commit bertahap dengan Conventional Commits, dan meminta setiap perubahan dibuktikan dengan `flutter analyze` dan `flutter test` di mesin sendiri.
+- **Keterbatasan yang ditemukan dan perbaikan manual:**
+  - Kode awal belum pernah dikompilasi oleh AI; `google_fonts` 9 ternyata membangun helper `TextTheme`-nya di atas paket `material_ui` yang tipenya berbeda dari `TextTheme` Flutter, sehingga tema diubah untuk menerapkan font per `TextStyle`.
+  - Kartu modul di halaman Home awalnya memakai tinggi tetap dan overflow 4 px; ditemukan oleh widget test lalu diganti menjadi grid yang tingginya mengikuti konten.
+  - AI tidak memiliki akses push ke GitHub; semua push, review, dan merge dilakukan anggota tim.
+
+### Garden Setup — Jotham Seanvedi Takin Allo
+
+TODO
+
+### Garden Planning — Ayyasi
+- Fitur Garden Planning dipakai untuk membuat rencana penanaman. Aplikasi akan memunculkan rekomendasi tanaman yang berbeda berdasarkan input tempat pengguna. Setelah mendapat input pengguna, server akan mencocokan cuaca tempat dari API weather forecasting yang akan diteruskan ke API perenual untuk memunculkan rekomendasi tanamannya. Setelah mendapat rekomendasi tanaman, user bisa memasukkan tanaman yang ada ke dalam keranjang bernama "garden plan".
+
+TODO
+
+### Plant Care — Nashri Khalid
+
+TODO
+
+### Garden Journal — Adinda Pika Fauziah
+
+TODO
