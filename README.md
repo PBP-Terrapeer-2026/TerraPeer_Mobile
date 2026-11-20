@@ -194,4 +194,17 @@ TODO
 
 ### Garden Journal — Adinda Pika Fauziah
 
-TODO
+Garden Journal merupakan modul yang digunakan untuk mencatat dan mendokumentasikan perkembangan tanaman yang dimiliki pengguna. Modul ini membantu pengguna merekam berbagai peristiwa penting selama proses pertumbuhan tanaman, sehingga riwayat perkembangan kebun dapat ditinjau kembali sebagai bahan evaluasi dan perencanaan penanaman berikutnya.
+
+Informasi yang dikelola dalam modul Garden Journal meliputi:
+- **Tanaman terkait:** menghubungkan catatan jurnal dengan tanaman yang dimiliki pengguna melalui model `my_plants.Plant`.
+- **Tanggal catatan:** mencatat tanggal terjadinya observasi atau peristiwa pada tanaman (`entry_date`).
+- **Jenis catatan:** mengategorikan peristiwa yang dicatat, seperti pertumbuhan, pembungaan, pembuahan, panen, atau permasalahan tanaman (`entry_type`).
+- **Judul dan deskripsi:** menyimpan ringkasan dan penjelasan mengenai kondisi atau perkembangan tanaman (`title` dan `notes`).
+- **Jumlah panen:** menyimpan kuantitas hasil panen apabila jenis catatan merupakan aktivitas panen (`harvest_quantity`).
+
+Data Garden Journal dikelola melalui Django REST Framework dengan endpoint `/api/v1/journal-entries/`. Endpoint tersebut menyediakan operasi pengambilan daftar dan detail catatan, penambahan, pembaruan, serta penghapusan data dengan autentikasi pengguna.
+
+Setiap catatan hanya dapat diakses dan dikelola oleh pemiliknya. Tanaman yang dihubungkan pada catatan juga harus merupakan tanaman milik pengguna yang sedang login. Nama tanaman (`plant_name`) diisi secara otomatis berdasarkan nama tanaman yang dipilih. Untuk catatan bertipe panen, jumlah panen wajib diisi dengan nilai nonnegatif, sedangkan catatan selain panen tidak menyimpan kuantitas maupun satuan panen.
+
+Pada aplikasi mobile, modul ini dirancang untuk menampilkan riwayat perkembangan tanaman dalam bentuk timeline melalui data yang diperoleh dari web service Django REST Framework. Implementasi tampilan dan integrasi mobile dikembangkan secara bertahap.
