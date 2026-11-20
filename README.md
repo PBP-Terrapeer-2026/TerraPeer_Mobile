@@ -181,7 +181,16 @@ Tim memakai alat AI sebagai asisten, bukan pengganti pemahaman. Semua perubahan 
 
 ### Garden Setup — Jotham Seanvedi Takin Allo
 
-TODO
+Garden Setup merupakan modul yang digunakan untuk mengelola profil ruang tanam (*Growing Space*) milik pengguna. Modul ini membantu pengguna mendefinisikan kondisi lingkungan tempat tanaman akan dibudidayakan agar dapat menjadi dasar bagi proses rekomendasi dan perencanaan tanaman.
+
+Informasi yang dikelola dalam modul Garden Setup meliputi:
+- **Jenis ruang:** menentukan tipe ruang tanam, seperti indoor atau outdoor.
+- **Lokasi:** menyimpan informasi lokasi ruang tanam.
+- **Durasi paparan cahaya:** mencatat lama paparan sinar matahari pada ruang tanam.
+- **Media tanam:** menentukan media yang digunakan untuk membudidayakan tanaman.
+- **Frekuensi perawatan:** mencatat frekuensi perawatan yang dibutuhkan pada ruang tanam.
+
+Data Garden Setup dikelola melalui Django REST Framework dengan endpoint `/api/v1/spaces/`. Endpoint tersebut menyediakan operasi pengambilan, penambahan, pembaruan, dan penghapusan data dengan autentikasi pengguna. Data ruang tanam disimpan pada database situs web TerraPeer dan dapat diakses melalui aplikasi mobile.
 
 ### Garden Planning — Ayyasi
 - Fitur Garden Planning dipakai untuk membuat rencana penanaman. Aplikasi akan memunculkan rekomendasi tanaman yang berbeda berdasarkan input tempat pengguna. Setelah mendapat input pengguna, server akan mencocokan cuaca tempat dari API weather forecasting yang akan diteruskan ke API perenual untuk memunculkan rekomendasi tanamannya. Setelah mendapat rekomendasi tanaman, user bisa memasukkan tanaman yang ada ke dalam keranjang bernama "garden plan".
