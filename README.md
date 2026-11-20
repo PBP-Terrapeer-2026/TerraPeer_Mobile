@@ -93,30 +93,66 @@ Untuk memakai server Django lokal dari emulator Android:
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8000
 ```
 
-## Struktur Kode
+## Arsitektur
+
+Aplikasi memakai **Clean Architecture** per fitur. Setiap modul punya tiga lapisan, dan dependensi hanya mengarah ke dalam (`presentation` → `domain` ← `data`):
+
+| Lapisan | Isi | Boleh import |
+| --- | --- | --- |
+| `domain/` | Entity (kelas Dart murni) dan repository abstrak | Tidak ada (tanpa Flutter, tanpa HTTP) |
+| `data/` | Model JSON, data source (panggilan API lewat `ApiClient`), implementasi repository | `domain/`, `core/` |
+| `presentation/` | Provider (`ChangeNotifier`: state loading / data / error), pages, widgets | `domain/`, `core/` |
+
+Layanan bersama dibuat sekali di `main.dart` (composition root) lalu dibagikan dengan **Provider**. Modul `auth` adalah contoh lengkap ketiga lapisan.
 
 ```
 lib/
-├── main.dart
-├── app.dart                    # MaterialApp + router + tema
+├── main.dart                   # composition root: membuat ApiClient, AuthProvider
+├── app.dart                    # MultiProvider + MaterialApp.router + tema
 ├── core/                       # dipakai bersama oleh semua modul
-│   ├── config/env.dart         # base URL API
-│   ├── router/                 # go_router, daftar route & destinasi navigasi
+│   ├── config/env.dart         # base URL API (bisa diganti dengan --dart-define)
+│   ├── network/                # ApiClient (token, JSON, timeout) + ApiException (parser error DRF)
+│   ├── storage/                # penyimpanan token login
+│   ├── router/                 # go_router: route, guard login, transisi halaman
 │   ├── theme/                  # warna & tipografi (sama dengan situs web)
-│   └── widgets/                # app shell (drawer/rail), loading/error/empty view
+│   └── widgets/                # app shell (drawer / navigation rail), loading / error / empty view
 └── features/
+    ├── auth/                   # login, logout, sesi (contoh referensi)
     ├── home/
     ├── garden_setup/           # Jotham
     ├── garden_planning/        # Ayyasi
     ├── my_plants/              # Farel
     ├── plant_care/             # Nashri
     └── garden_journal/         # Adinda
-        ├── data/models/        # model JSON
-        ├── data/services/      # pemanggilan API
-        └── presentation/       # pages & widgets
+        ├── domain/{entities, repositories}/
+        ├── data/{models, datasources, repositories}/
+        └── presentation/{providers, pages, widgets}/
 ```
 
-Navigasi responsif: drawer di ponsel, navigation rail di tablet/layar lebar.
+### Navigasi dan autentikasi
+
+- **Responsif:** drawer di ponsel, navigation rail di tablet/layar lebar (≥ 840 px), dengan transisi fade antarhalaman.
+- **Guest** hanya bisa membuka Home dan Login. Membuka modul lain akan diarahkan ke Login, lalu otomatis kembali ke modul tersebut setelah berhasil masuk.
+- **Token** disimpan di perangkat sehingga pengguna tetap login setelah aplikasi ditutup. Jika server membalas `401` (token kedaluwarsa), pengguna otomatis keluar.
+
+### Memanggil API dari modul
+
+```dart
+// data/datasources/my_plants_remote_data_source.dart
+final json = await apiClient.get('/my-plants/');          // GET list
+await apiClient.post('/my-plants/', body: plant.toJson()); // POST create
+```
+
+Setiap kegagalan dilempar sebagai `ApiException` (berisi `message`, `statusCode`, dan `fieldErrors` per field dari serializer DRF), sehingga semua modul menampilkan error dengan cara yang sama.
+
+## Pengujian
+
+```bash
+flutter analyze
+flutter test
+```
+
+Test mencakup navigasi (drawer, navigation rail, kartu Home), alur login (validasi form, kredensial salah, redirect kembali ke modul, logout, token kedaluwarsa), aturan redirect, dan parser error DRF.
 
 ## Aturan Kolaborasi
 
