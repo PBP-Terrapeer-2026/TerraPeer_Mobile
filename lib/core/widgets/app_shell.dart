@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../router/app_destinations.dart';
+import '../router/app_routes.dart';
 import '../theme/app_colors.dart';
 
 /// Responsive frame around every top-level page.
@@ -31,7 +34,7 @@ class AppShell extends StatelessWidget {
 
     if (width < railBreakpoint) {
       return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        appBar: AppBar(title: Text(title), actions: const [_AccountAction()]),
         drawer: _AppDrawer(selectedIndex: selected, onSelected: goTo),
         body: SafeArea(top: false, child: child),
       );
@@ -39,7 +42,7 @@ class AppShell extends StatelessWidget {
 
     final extended = width >= extendedRailBreakpoint;
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title), actions: const [_AccountAction()]),
       body: SafeArea(
         top: false,
         child: Row(
@@ -108,6 +111,55 @@ class _AppDrawer extends StatelessWidget {
             selectedIcon: Icon(d.selectedIcon),
             label: Text(d.label),
           ),
+      ],
+    );
+  }
+}
+
+/// Login button for guests; account menu with logout for logged-in users.
+class _AccountAction extends StatelessWidget {
+  const _AccountAction();
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
+    if (!auth.isAuthenticated) {
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: TextButton.icon(
+          onPressed: () => context.go(AppRoutes.login),
+          icon: const Icon(Icons.login),
+          label: const Text('Masuk'),
+        ),
+      );
+    }
+
+    return PopupMenuButton<String>(
+      tooltip: 'Akun',
+      icon: const Icon(Icons.account_circle_outlined),
+      onSelected: (value) {
+        if (value != 'logout') return;
+        final auth = context.read<AuthProvider>();
+        // Go to the public home page first, so logging out does not bounce
+        // the user from a protected page to the login page.
+        context.go(AppRoutes.home);
+        auth.logout();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          child: Text('Masuk sebagai ${auth.username}'),
+        ),
+        const PopupMenuDivider(),
+        const PopupMenuItem<String>(
+          value: 'logout',
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.logout),
+            title: Text('Keluar'),
+          ),
+        ),
       ],
     );
   }
