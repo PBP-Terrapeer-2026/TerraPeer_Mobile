@@ -199,7 +199,18 @@ TODO
 
 ### Plant Care — Nashri Khalid
 
-TODO
+Plant Care membantu pengguna merencanakan dan mencatat perawatan tanaman aktif miliknya, seperti menyiram, memangkas, atau memeriksa kondisi daun. Setiap tugas terhubung ke satu tanaman sehingga pengguna dapat melihat pekerjaan yang perlu dilakukan dan riwayat perawatannya.
+
+Cakupan modul Plant Care meliputi:
+
+- **Daftar dan detail tugas.** Setiap tugas memuat judul, jenis tindakan, tanggal pelaksanaan, status (`Pending` atau `Completed`), serta instruksi opsional. Tugas yang masih tertunda diurutkan dari jadwal paling awal dan diberi tanda `Overdue` jika tanggalnya sudah lewat.
+- **Pembuatan dan perubahan jadwal.** Pengguna dapat membuat tugas sekali jalan atau berulang setiap beberapa hari, misalnya menyiram setiap tiga hari. Jadwal, instruksi, dan interval tugas yang masih tertunda dapat diubah. Interval minimal satu hari.
+- **Penyelesaian dan pengulangan.** Saat tugas ditandai selesai, sistem mencatat waktu penyelesaiannya. Untuk tugas berulang pada tanaman yang masih aktif, sistem membuat satu tugas berikutnya sesuai interval.
+- **Penghapusan.** Menghapus tugas berulang yang masih tertunda menghentikan rangkaiannya dan mempertahankan riwayat tugas selesai. Menghapus satu catatan yang sudah selesai hanya menghapus catatan tersebut.
+- **Filter per tanaman.** Pengguna dapat menggabungkan filter waktu (semua tanggal, hari ini, atau mendatang) dengan status tugas untuk melihat pekerjaan yang relevan.
+- **Prakiraan cuaca.** Data Open-Meteo memberikan konteks perawatan berdasarkan lokasi dan zona waktu kebun, termasuk suhu minimum dan maksimum, peluang hujan, serta perkiraan curah hujan harian.
+
+Data tugas tersimpan di database Django TerraPeer. Endpoint Django REST Framework `/api/v1/care-tasks/` menyediakan operasi baca, tambah, ubah, dan hapus dengan akses terbatas pada tugas milik pengguna yang sudah login. Halaman Flutter menggunakan API client bersama untuk mengambil daftar tugas dan menampilkan judul, tanggal, serta statusnya.
 
 ### Garden Journal — Adinda Pika Fauziah
 
