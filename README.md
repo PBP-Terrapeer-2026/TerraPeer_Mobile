@@ -11,11 +11,11 @@ Aplikasi mobile **TerraPeer** berbasis Flutter, dibuat untuk Proyek Akhir Semest
 
 | Nama | NPM | GitHub |
 | --- | --- | --- |
-| Jotham Seanvedi Takin Allo | TODO | [`seanve1`](https://github.com/seanve1) |
-| Ayyasi | TODO | [`Asepgunawan112`](https://github.com/Asepgunawan112) |
-| Muhammad Farel Ammar | TODO | [`marlioboro`](https://github.com/marlioboro) |
-| Nashri Khalid | TODO | [`nashrikhalid`](https://github.com/nashrikhalid) |
-| Adinda Pika Fauziah | TODO | [`pikadinda`](https://github.com/pikadinda) |
+| Jotham Seanvedi Takin Allo | 2506584161 | [`seanve1`](https://github.com/seanve1) |
+| Ayyasi | 2506550482 | [`Asepgunawan112`](https://github.com/Asepgunawan112) |
+| Muhammad Farel Ammar | 2506585731 | [`marlioboro`](https://github.com/marlioboro) |
+| Nashri Khalid | 2506657131 | [`nashrikhalid`](https://github.com/nashrikhalid) |
+| Adinda Pika Fauziah | 2506533646 | [`pikadinda`](https://github.com/pikadinda) |
 
 ## Deskripsi Aplikasi
 
