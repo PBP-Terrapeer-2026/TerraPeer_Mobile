@@ -193,9 +193,19 @@ Informasi yang dikelola dalam modul Garden Setup meliputi:
 Data Garden Setup dikelola melalui Django REST Framework dengan endpoint `/api/v1/spaces/`. Endpoint tersebut menyediakan operasi pengambilan, penambahan, pembaruan, dan penghapusan data dengan autentikasi pengguna. Data ruang tanam disimpan pada database situs web TerraPeer dan dapat diakses melalui aplikasi mobile.
 
 ### Garden Planning — Ayyasi
-- Fitur Garden Planning dipakai untuk membuat rencana penanaman. Aplikasi akan memunculkan rekomendasi tanaman yang berbeda berdasarkan input tempat pengguna. Setelah mendapat input pengguna, server akan mencocokan cuaca tempat dari API weather forecasting yang akan diteruskan ke API perenual untuk memunculkan rekomendasi tanamannya. Setelah mendapat rekomendasi tanaman, user bisa memasukkan tanaman yang ada ke dalam keranjang bernama "garden plan".
+Garden Planning merupakan modul yang digunakan untuk menyusun rencana penanaman (planting plan) milik pengguna. Modul ini membantu pengguna memperoleh rekomendasi tanaman yang sesuai dengan kondisi lingkungan tempat budidaya serta menyimpannya ke dalam daftar rencana tanam pribadi.
 
-TODO
+Alur kerja dan komponen utama yang dikelola dalam modul Garden Planning meliputi:
+
+- Input lokasi: menerima input lokasi atau tempat penanaman dari pengguna sebagai dasar pencarian.
+
+- Sinkronisasi cuaca (Weather Forecasting API): mencocokkan lokasi pengguna dengan data prakiraan cuaca terkini dari API weather forecasting pada sisi server.
+
+- Rekomendasi tanaman (Perenual API): meneruskan parameter kondisi cuaca tersebut ke API Perenual untuk memunculkan daftar rekomendasi tanaman yang sesuai.
+
+- Keranjang rencana (Garden Plan): pengguna memilih dan memasukkan tanaman hasil rekomendasi ke dalam keranjang bernama Garden Plan.
+
+- Data Garden Planning dikelola melalui Django REST Framework dengan endpoint /api/v1/garden_planning/. Endpoint tersebut menyediakan operasi pengambilan data rekomendasi serta pengelolaan daftar item pada Garden Plan dengan autentikasi pengguna. Data rencana penanaman disimpan pada database situs web TerraPeer dan dapat diakses melalui aplikasi mobile.
 
 ### Plant Care — Nashri Khalid
 
