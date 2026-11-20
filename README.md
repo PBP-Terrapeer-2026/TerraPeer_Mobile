@@ -184,6 +184,7 @@ Tim memakai alat AI sebagai asisten, bukan pengganti pemahaman. Semua perubahan 
 TODO
 
 ### Garden Planning — Ayyasi
+- Fitur Garden Planning dipakai untuk membuat rencana penanaman. Aplikasi akan memunculkan rekomendasi tanaman yang berbeda berdasarkan input tempat pengguna. Setelah mendapat input pengguna, server akan mencocokan cuaca tempat dari API weather forecasting yang akan diteruskan ke API perenual untuk memunculkan rekomendasi tanamannya. Setelah mendapat rekomendasi tanaman, user bisa memasukkan tanaman yang ada ke dalam keranjang bernama "garden plan".
 
 TODO
 
